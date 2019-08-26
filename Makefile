@@ -781,6 +781,8 @@ KBUILD_CFLAGS += $(call cc-option, -Wno-sometimes-uninitialized)
 # Quiet clang warning: comparison of unsigned expression < 0 is always false
 
 KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+
+ifdef CONFIG_MODULES
 # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
 # source of a reference will be _MergedGlobals and not on of the whitelisted names.
 # See modpost pattern 2
@@ -907,6 +909,7 @@ DISABLE_CFI_CLANG += -fno-sanitize-cfi-cross-dso
 endif
 ifdef CONFIG_CFI_PERMISSIVE
 cfi-clang-flags	+= -fsanitize-recover=cfi -fno-sanitize-trap=cfi
+endif
 endif
 
 # also disable CFI when LTO is disabled
