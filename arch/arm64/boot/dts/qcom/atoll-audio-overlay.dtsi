@@ -451,6 +451,9 @@
 		pinctrl-1 = <&quin_mi2s_sck_sleep &quin_mi2s_ws_sleep
 			     &quin_mi2s_sd0_sleep &quin_mi2s_sd1_sleep>;
 		qcom,lpi-gpios;
+		qcom,chip-wakeup-reg = <0x01FFB000>;
+		qcom,chip-wakeup-maskbit = <0>;
+		qcom,chip-wakeup-default-val = <0x1>;
 	};
 };
 
