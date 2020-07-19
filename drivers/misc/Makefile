@@ -94,6 +94,8 @@ obj-$(CONFIG_OKL4_LINK_SHBUF)    += okl4-link-shbuf.o
 obj-$(CONFIG_ANT_CHECK)		+= ant_check.o
 obj-$(CONFIG_ANT_CHECK_DIV)		+= ant_check_div.o
 obj-$(CONFIG_LDO_WL2866D)     += wl2866d.o
+obj-$(CONFIG_AW8624_HAPTIC) += aw8624_haptic/
+
 #board id
 obj-y += board_id.o
 obj-y 							+= mi-memory/

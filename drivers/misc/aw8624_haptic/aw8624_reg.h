@@ -129,6 +129,7 @@
 #define REG_NONE_ACCESS		0
 #define REG_RD_ACCESS		(1 << 0)
 #define REG_WR_ACCESS			(1 << 1)
+#define AW8624_REG_MAX 0xff
 
 
 const unsigned char aw8624_reg_access[AW8624_REG_MAX] = {
@@ -413,6 +414,10 @@ const unsigned char aw8624_reg_access[AW8624_REG_MAX] = {
 #define AW8624_BIT_DBGCTRL_INTN_TRG_SEL_MASK		(~(1<<5))
 #define AW8624_BIT_DBGCTRL_INTN_SEL_ENABLE		(1<<5)
 #define AW8624_BIT_DBGCTRL_TRG_SEL_ENABLE		(0<<5)
+#define AW8624_BIT_DBGCTRL_INTMODE_MASK			(~(3<<2))
+#define AW8624_BIT_DBGCTRL_INTN_LEVEL_MODE		(0<<2)
+#define AW8624_BIT_DBGCTRL_INTN_POSEDGE_MODE		(1<<2)
+#define AW8624_BIT_DBGCTRL_INTN_BOTH_EDGE_MODE		(3<<2)
 
  /* DATCTRL */
 #define AW8624_BIT_DATCTRL_FC_MASK			(~(1<<6))
@@ -430,7 +435,7 @@ const unsigned char aw8624_reg_access[AW8624_REG_MAX] = {
 #define AW8624_BIT_PWMPRC_PRC_DISABLE			(0<<7)
 #define AW8624_BIT_PWMPRC_PRCTIME_MASK			(~(0x7f<<0))
 
- /* PWMDBG */
+ /* REG:0X2E PWMDBG */
 #define AW8624_BIT_PWMDBG_PWM_MODE_MASK			(~(3<<5))
 #define AW8624_BIT_PWMDBG_PWM_12K			(3<<5)
 #define AW8624_BIT_PWMDBG_PWM_24K			(2<<5)
@@ -439,11 +444,6 @@ const unsigned char aw8624_reg_access[AW8624_REG_MAX] = {
  /* WAVECTRL */
 #define AW8624_BIT_WAVECTRL_NUM_OV_DRIVER_MASK		(~(0xF<<4))
 #define AW8624_BIT_WAVECTRL_NUM_OV_DRIVER		(0<<4)
-
- /* BST_AUTO */
-#define AW8624_BIT_BST_AUTO_BST_AUTOSW_MASK		(~(1<<2))
-#define AW8624_BIT_BST_AUTO_BST_AUTOMATIC_BOOST		(1<<2)
-#define AW8624_BIT_BST_AUTO_BST_MANUAL_BOOST		(0<<2)
 
  /* CONT_CTRL */
 #define AW8624_BIT_CONT_CTRL_ZC_DETEC_MASK		(~(1<<7))
@@ -532,4 +532,3 @@ const unsigned char aw8624_reg_access[AW8624_REG_MAX] = {
 #define AW8624_BIT_R_SPARE_MASK				(~(1<<7))
 #define AW8624_BIT_R_SPARE_ENABLE			(1<<7)
 #endif
-
