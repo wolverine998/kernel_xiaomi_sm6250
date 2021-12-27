@@ -19,6 +19,7 @@
 #include "atoll-sde-display.dtsi"
 #include "sdmmagpie-thermal-overlay.dtsi"
 #include "atoll-common-overlay.dtsi"
+#include "touchscreen.dtsi"
 
 &qupv3_se10_spi {
 	status = "ok";
