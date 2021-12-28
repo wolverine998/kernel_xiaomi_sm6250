@@ -4751,13 +4751,9 @@ static int dwc3_otg_start_peripheral(struct dwc3_msm *mdwc, int on)
 		atomic_read(&mdwc->dev->power.usage_count));
 
 	if (on) {
-	#ifdef CONFIG_TARGET_PROJECT_J20C
-		dev_err(mdwc->dev, "%s: turn on gadget %s\n",
-					__func__, dwc->gadget.name);
-	#else
 		dev_dbg(mdwc->dev, "%s: turn on gadget %s\n",
-                                         __func__, dwc->gadget.name);
-	#endif
+					__func__, dwc->gadget.name);
+
 		dwc3_override_vbus_status(mdwc, true);
 		usb_phy_notify_connect(mdwc->hs_phy, USB_SPEED_HIGH);
 		usb_phy_notify_connect(mdwc->ss_phy, USB_SPEED_SUPER);
@@ -4898,10 +4894,8 @@ static int dwc3_msm_gadget_vbus_draw(struct dwc3_msm *mdwc, unsigned int mA)
 		 * bail out if suspend happened with float cable
 		 * connected
 		 */
-		/* xiaomi charger driver need this current config float current, so remove this qcom default return feature.
 		if (mA == 2)
 			return 0;
-		*/
 
 		if (!mA)
 			pval.intval = -ETIMEDOUT;

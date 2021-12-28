@@ -1,4 +1,5 @@
 /* Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2020 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -70,20 +71,6 @@ struct pd_phy_params {
 	enum power_role power_role;
 	u8		frame_filter_val;
 };
-
-#ifdef CONFIG_TARGET_PROJECT_J20C
-struct usbpd_pdo {
-	bool pps;
-	int type;
-	int max_volt_mv;
-	int min_volt_mv;
-	int curr_ma;
-	int pos;
-};
-
-int usbpd_get_pps_status(struct usbpd *pd, u32 *status);
-int usbpd_fetch_pdo(struct usbpd *pd, struct usbpd_pdo *pdos);
-#endif
 
 #if IS_ENABLED(CONFIG_QPNP_USB_PDPHY)
 int pd_phy_open(struct pd_phy_params *params);
