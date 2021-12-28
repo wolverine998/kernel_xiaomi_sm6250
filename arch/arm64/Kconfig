@@ -845,12 +845,6 @@ config KERNEL_CUSTOM_FACTORY
         help
         Custom for FACTORY_pcb.
 
-config THERMAL_SWITCH
-    default n
-        bool "Support themral config switch"
-	    help
-	            Support themral config switch.
-
 config ARM64_DMA_USE_IOMMU
 	bool "ARM64 DMA iommu integration"
 	select ARM_HAS_SG_CHAIN
