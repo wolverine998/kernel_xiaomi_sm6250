@@ -49,20 +49,20 @@ make -j$(nproc --all) O=out \
                       OBJDUMP=llvm-objdump \
                       STRIP=llvm-strip
 
-echo "**** Verify Image.gz-dtb & dtbo.img ****"
-ls $PWD/out/arch/arm64/boot/Image.gz-dtb
+echo "**** Verify Image.gz & dtbo.img ****"
+ls $PWD/out/arch/arm64/boot/Image.gz
 ls $PWD/out/arch/arm64/boot/dtbo.img
 
 # Anykernel 3 time!!
 echo "**** Verifying AnyKernel3 Directory ****"
 ls $ANYKERNEL3_DIR
 echo "**** Removing leftovers ****"
-rm -rf $ANYKERNEL3_DIR/Image.gz-dtb
+rm -rf $ANYKERNEL3_DIR/Image.gz
 rm -rf $ANYKERNEL3_DIR/dtbo.img
 rm -rf $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP
 
-echo "**** Copying Image.gz-dtb & dtbo.img ****"
-cp $PWD/out/arch/arm64/boot/Image.gz-dtb $ANYKERNEL3_DIR/
+echo "**** Copying Image.gz & dtbo.img ****"
+cp $PWD/out/arch/arm64/boot/Image.gz $ANYKERNEL3_DIR/
 cp $PWD/out/arch/arm64/boot/dtbo.img $ANYKERNEL3_DIR/
 
 echo "**** Time to zip up! ****"
@@ -72,7 +72,7 @@ zip -r9 "../$FINAL_KERNEL_ZIP" * -x README $FINAL_KERNEL_ZIP
 echo "**** Done, here is your sha1 ****"
 cd ..
 rm -rf $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP
-rm -rf $ANYKERNEL3_DIR/Image.gz-dtb
+rm -rf $ANYKERNEL3_DIR/Image.gz
 rm -rf $ANYKERNEL3_DIR/dtbo.img
 rm -rf out/
 
