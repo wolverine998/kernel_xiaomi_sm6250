@@ -52,6 +52,7 @@ make -j$(nproc --all) O=out \
 echo "**** Verify Image.gz & dtbo.img ****"
 ls $PWD/out/arch/arm64/boot/Image.gz
 ls $PWD/out/arch/arm64/boot/dtbo.img
+ls $PWD/out/arch/arm64/boot/dtb.img
 
 # Anykernel 3 time!!
 echo "**** Verifying AnyKernel3 Directory ****"
@@ -59,11 +60,13 @@ ls $ANYKERNEL3_DIR
 echo "**** Removing leftovers ****"
 rm -rf $ANYKERNEL3_DIR/Image.gz
 rm -rf $ANYKERNEL3_DIR/dtbo.img
+rm -rf $ANYKERNEL3_DIR/dtb.img
 rm -rf $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP
 
 echo "**** Copying Image.gz & dtbo.img ****"
 cp $PWD/out/arch/arm64/boot/Image.gz $ANYKERNEL3_DIR/
 cp $PWD/out/arch/arm64/boot/dtbo.img $ANYKERNEL3_DIR/
+cp $PWD/out/arch/arm64/boot/dtb.img $ANYKERNEL3_DIR/
 
 echo "**** Time to zip up! ****"
 cd $ANYKERNEL3_DIR/
@@ -74,6 +77,7 @@ cd ..
 rm -rf $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP
 rm -rf $ANYKERNEL3_DIR/Image.gz
 rm -rf $ANYKERNEL3_DIR/dtbo.img
+rm -rf $ANYKERNEL3_DIR/dtb.img
 rm -rf out/
 
 sha1sum $FINAL_KERNEL_ZIP
