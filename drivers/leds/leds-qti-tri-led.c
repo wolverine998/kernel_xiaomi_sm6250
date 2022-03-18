@@ -1,4 +1,4 @@
-/* Copyright (c) 2018-2019, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2018-2019,2021 The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -419,7 +419,6 @@ static int qpnp_tri_led_register(struct qpnp_tri_led_chip *chip)
 		led->cdev.blink_set = qpnp_tri_led_set_blink;
 		led->cdev.default_trigger = led->default_trigger;
 		led->cdev.brightness = LED_OFF;
-		led->cdev.flags |= LED_KEEP_TRIGGER;
 
 		rc = devm_led_classdev_register(chip->dev, &led->cdev);
 		if (rc < 0) {
@@ -587,7 +586,8 @@ static int qpnp_tri_led_probe(struct platform_device *pdev)
 
 	rc = qpnp_tri_led_parse_dt(chip);
 	if (rc < 0) {
-		dev_err(chip->dev, "Devicetree properties parsing failed, rc=%d\n",
+		if (rc != -EPROBE_DEFER)
+			dev_err(chip->dev, "Devicetree properties parsing failed, rc=%d\n",
 								rc);
 		return rc;
 	}

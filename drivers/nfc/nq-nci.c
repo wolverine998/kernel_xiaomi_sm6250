@@ -30,6 +30,19 @@
 #endif
 #include <linux/jiffies.h>
 
+#ifdef CONFIG_TARGET_PROJECT_J6
+#define SKIP_NFCC_HW_CHECK
+#define LC_NFC_CHECK
+#endif
+
+#ifdef CONFIG_TARGET_PROJECT_J20C
+#define SKIP_NFCC_HW_CHECK
+#define CHECK_NFC_NONE_NFC 1
+#ifdef CHECK_NFC_NONE_NFC
+extern char *saved_command_line;
+#endif
+#endif
+
 struct nqx_platform_data {
 	unsigned int irq_gpio;
 	unsigned int en_gpio;
@@ -560,6 +573,7 @@ int nfc_ioctl_power_states(struct file *filp, unsigned long arg)
 	int r = 0;
 	struct nqx_dev *nqx_dev = filp->private_data;
 
+	/*NFC MW send command MODE_NFC_ENABLED&MODE_NFC_DISABLED failed caused force download nfc fw.*/
 	if (arg == 0 || arg == 8) {
 		/*
 		 * We are attempting a hardware reset so let us disable
@@ -1223,6 +1237,12 @@ static int nqx_probe(struct i2c_client *client,
 	struct nqx_dev *nqx_dev;
 
 	dev_dbg(&client->dev, "%s: enter\n", __func__);
+#ifdef CHECK_NFC_NONE_NFC
+	if (strnstr(saved_command_line, "androidboot.hwc=India", strlen(saved_command_line)) != NULL) {
+		dev_err(&client->dev, "%s:CHECK_NFC_NONE_NFC androidboot.hwc=India :not nqx_probe\n", __func__);
+		return -ENODEV;
+	}
+#endif
 	if (client->dev.of_node) {
 		platform_data = devm_kzalloc(&client->dev,
 			sizeof(struct nqx_platform_data), GFP_KERNEL);
@@ -1438,6 +1458,9 @@ static int nqx_probe(struct i2c_client *client,
 	}
 	nqx_disable_irq(nqx_dev);
 
+#ifdef SKIP_NFCC_HW_CHECK
+	goto skip_nfcc_hw_check;
+#endif
 	/*
 	 * To be efficient we need to test whether nfcc hardware is physically
 	 * present before attempting further hardware initialisation.
@@ -1450,6 +1473,9 @@ static int nqx_probe(struct i2c_client *client,
 		/* We don't think there is hardware switch NFC OFF */
 		goto err_request_hw_check_failed;
 	}
+#ifdef SKIP_NFCC_HW_CHECK
+skip_nfcc_hw_check:
+#endif
 
 	/* Register reboot notifier here */
 	r = register_reboot_notifier(&nfcc_notifier);
@@ -1608,14 +1634,22 @@ static struct i2c_driver nqx = {
 	},
 };
 
+
+/*HMI_700_A01-395,2020-08-31,wanglixiang.*/
+/*nfc driver nfcc_reboot()can turn off ven(NFC_ENABLE)*/
 static int nfcc_reboot(struct notifier_block *notifier, unsigned long val,
 			  void *v)
 {
-	gpio_set_value(disable_ctrl, 1);
+    #ifdef CONFIG_TARGET_PROJECT_J6
+    gpio_set_value(disable_ctrl, 1);
+    #endif
+
+    #ifdef CONFIG_TARGET_PROJECT_J20C
+    gpio_set_value(disable_ctrl, 0);
+    #endif
+
 	return NOTIFY_OK;
 }
-
-#define LC_NFC_CHECK
 
 #ifdef LC_NFC_CHECK
 

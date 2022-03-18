@@ -162,6 +162,9 @@ struct cam_cmd_probe {
 	uint32_t    data_mask;
 	uint16_t    camera_id;
 	uint16_t    reserved;
+	#ifdef CONFIG_TARGET_PROJECT_K7_CAMERA
+	//char	    sensorName[32];
+	#endif
 } __attribute__((packed));
 
 /**

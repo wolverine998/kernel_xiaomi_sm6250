@@ -1,7 +1,7 @@
 /* include/linux/timed_output.h
  *
  * Copyright (C) 2008 Google, Inc.
- * Copyright (C) 2020 XiaoMi, Inc.
+ * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and

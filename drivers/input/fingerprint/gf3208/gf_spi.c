@@ -1,7 +1,7 @@
 /*
  * TEE driver for goodix fingerprint sensor
  * Copyright (C) 2016 Goodix
- * Copyright (C) 2020 XiaoMi, Inc.
+ * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -413,8 +413,8 @@ static void gf_kernel_key_input(struct gf_dev *gf_dev, struct gf_key *gf_key)
 	}
 
 	if (gf_key->key == GF_KEY_HOME) {
-		//input_report_key(gf_dev->input, key_input, gf_key->value);
-		//input_sync(gf_dev->input);
+		input_report_key(gf_dev->input, key_input, gf_key->value);
+		input_sync(gf_dev->input);
 	}
 }
 

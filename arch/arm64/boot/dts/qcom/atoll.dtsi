@@ -1,4 +1,5 @@
 /* Copyright (c) 2019-2020, The Linux Foundation.All rights reserved.
+ * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -50,6 +51,7 @@
 		sdhc1 = &sdhc_1; /* eMMC */
 		sdhc2 = &sdhc_2; /* SD Card */
 		ufshc1 = &ufshc_mem; /* Embedded UFS slot */
+		spi0 = &qupv3_se10_spi;
 		swr0 = &swr0;
 		swr1 = &swr1;
 		swr2 = &swr2;
@@ -64,18 +66,22 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x0>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <487>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
+			d-cache-size = <0x8000>;
+			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_0>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			#cooling-cells = <2>;
 			L2_0: l2-cache {
 			      compatible = "arm,arch-cache";
+			      cache-size = <0x10000>;
 			      cache-level = <2>;
 			      next-level-cache = <&L3_0>;
 
 				L3_0: l3-cache {
 				      compatible = "arm,arch-cache";
+				      cache-size = <0x100000>;
 				      cache-level = <3>;
 				};
 			};
@@ -100,13 +106,16 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x100>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <487>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
+			d-cache-size = <0x8000>;
+			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_100>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			#cooling-cells = <2>;
 			L2_100: l2-cache {
 			      compatible = "arm,arch-cache";
+			      cache-size = <0x10000>;
 			      cache-level = <2>;
 			      next-level-cache = <&L3_0>;
 			};
@@ -132,13 +141,16 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x200>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <487>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
+			d-cache-size = <0x8000>;
+			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_200>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			#cooling-cells = <2>;
 			L2_200: l2-cache {
 			      compatible = "arm,arch-cache";
+			      cache-size = <0x10000>;
 			      cache-level = <2>;
 			      next-level-cache = <&L3_0>;
 			};
@@ -163,13 +175,16 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x300>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <487>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
+			d-cache-size = <0x8000>;
+			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_300>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			#cooling-cells = <2>;
 			L2_300: l2-cache {
 			      compatible = "arm,arch-cache";
+			      cache-size = <0x10000>;
 			      cache-level = <2>;
 			      next-level-cache = <&L3_0>;
 			};
@@ -194,13 +209,16 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x400>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <487>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
+			d-cache-size = <0x8000>;
+			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_400>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			#cooling-cells = <2>;
 			L2_400: l2-cache {
 			      compatible = "arm,arch-cache";
+			      cache-size = <0x10000>;
 			      cache-level = <2>;
 			      next-level-cache = <&L3_0>;
 			};
@@ -225,13 +243,16 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x500>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <487>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
+			d-cache-size = <0x8000>;
+			i-cache-size = <0x8000>;
 			next-level-cache = <&L2_500>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			#cooling-cells = <2>;
 			L2_500: l2-cache {
 			      compatible = "arm,arch-cache";
+			      cache-size = <0x10000>;
 			      cache-level = <2>;
 			      next-level-cache = <&L3_0>;
 			};
@@ -256,13 +277,16 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x600>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1740>;
+			capacity-dmips-mhz = <1024>;
 			sched-energy-costs = <&CPU_COST_1 &CLUSTER_COST_1>;
+			d-cache-size = <0x10000>;
+			i-cache-size = <0x10000>;
 			next-level-cache = <&L2_600>;
 			qcom,lmh-dcvs = <&lmh_dcvs1>;
 			#cooling-cells = <2>;
 			L2_600: l2-cache {
 			      compatible = "arm,arch-cache";
+			      cache-size = <0x40000>;
 			      cache-level = <2>;
 			      next-level-cache = <&L3_0>;
 			      qcom,dump-size = <0x48000>;
@@ -296,13 +320,16 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x700>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1740>;
+			capacity-dmips-mhz = <1024>;
 			sched-energy-costs = <&CPU_COST_1 &CLUSTER_COST_1>;
+			d-cache-size = <0x10000>;
+			i-cache-size = <0x10000>;
 			next-level-cache = <&L2_700>;
 			qcom,lmh-dcvs = <&lmh_dcvs1>;
 			#cooling-cells = <2>;
 			L2_700: l2-cache {
 			      compatible = "arm,arch-cache";
+			      cache-size = <0x40000>;
 			      cache-level = <2>;
 			      next-level-cache = <&L3_0>;
 			      qcom,dump-size = <0x48000>;
@@ -376,16 +403,16 @@
 
 		CPU_COST_0: core-cost0 {
 			busy-cost-data = <
-				 300000	10
-				 576000	18
-				 768000	23
-				1017600	36
-				1248000	52
-				1324800	67
-				1516800	76
-				1612800	92
-				1708800	113
-				1804800	119
+				 300000	38
+				 576000	57
+				 768000	69
+				1017600	78
+				1248000	99
+				1324800	106
+				1516800	118
+				1612800	130
+				1708800	137
+				1804800	156
 			>;
 			idle-cost-data = <
 				16 12 8 6
@@ -394,20 +421,19 @@
 
 		CPU_COST_1: core-cost1 {
 			busy-cost-data = <
-				 652800	242
-				 825600	293
-				 979200	424
-				1113600	470
-				1267200	676
-				1555200	973
-				1708800	1060
-				1843200	1298
-				1900800	1362
-				1996800	1562
-				2112000	1801
-				2208000	2000
-				2323200	2341
-				2400000	2568
+				 652800	116
+				 825600	136
+				 979200	163
+				1113600	183
+				1267200	221
+				1555200	295
+				1708800	345
+				1843200	288
+				1900800	404
+				1996800	449
+				2112000	520
+				2208000	545
+				2323200	593
 			>;
 			idle-cost-data = <
 				100 80 60 40
@@ -447,7 +473,6 @@
 				2112000	60
 				2208000	61
 				2323200	62
-				2400000	63
 			>;
 			idle-cost-data = <
 				5 4 3 2 1
@@ -465,7 +490,7 @@
 			compatible = "android,firmware";
 			vbmeta {
 				compatible = "android,vbmeta";
-				parts = "vbmeta,boot,system,vendor,dtbo";
+				parts = "vbmeta,boot,system,vendor,dtbo,recovery";
 			};
 			fstab {
 				compatible = "android,fstab";
@@ -474,7 +499,7 @@
 					dev = "/dev/block/platform/soc/1d84000.ufshc/by-name/vendor";
 					type = "ext4";
 					mnt_flags = "ro,barrier=1,discard";
-					fsmgr_flags = "wait,slotselect,avb";
+					fsmgr_flags = "wait,avb";
 					status = "ok";
 				};
 			};
@@ -631,10 +656,21 @@
 			size = <0 0x2000000>;
 			linux,cma-default;
 		};
+		/* reserve for pstore */
+		ramoops_mem: ramoops@9d800000 {
+			compatible = "ramoops";
+			reg = <0x0 0x9d800000 0x0 0x00400000>;
+
+			record-size = <0x80000>;
+			pmsg-size = <0x200000>;
+			console-size = <0x100000>;
+			ecc-size = <0x10>;
+		};
+
 	};
 
 	chosen {
-		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 noirqdebug kpti=0";
+		bootargs = "rcupdate.rcu_expedited=1 rcupdate.rcu_normal_after_boot=1 rcu_nocbs=0-7 nosoftlockup mce=ignore_ce kpti=0 quiet noirqdebug";
 	};
 
 	soc: soc { };
@@ -660,6 +696,13 @@
 		interrupt-parent = <&intc>;
 	};
 
+	sn_fuse: snfuse@0x00786134 {
+        compatible = "qcom,sn-fuse";
+        reg = <0x00786134 0x4>,
+              <0x0078607c 0x4>;
+        reg-names = "sn-base","fuse-state";
+       };
+	
 	pdc: interrupt-controller@b220000 {
 		compatible = "qcom,pdc-atoll";
 		reg = <0xb220000 0x400>;
@@ -778,7 +821,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU0>;
-		status = "disabled";
 	};
 
 	jtag_mm1: jtagmm@7140000 {
@@ -790,7 +832,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU1>;
-		status = "disabled";
 	};
 
 	jtag_mm2: jtagmm@7240000 {
@@ -802,7 +843,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU2>;
-		status = "disabled";
 	};
 
 	jtag_mm3: jtagmm@7340000 {
@@ -814,7 +854,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU3>;
-		status = "disabled";
 	};
 
 	jtag_mm4: jtagmm@7440000 {
@@ -826,7 +865,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU4>;
-		status = "disabled";
 	};
 
 	jtag_mm5: jtagmm@7540000 {
@@ -838,7 +876,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU5>;
-		status = "disabled";
 	};
 
 	jtag_mm6: jtagmm@7640000 {
@@ -850,7 +887,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU6>;
-		status = "disabled";
 	};
 
 	jtag_mm7: jtagmm@7740000 {
@@ -862,7 +898,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU7>;
-		status = "disabled";
 	};
 
 	qcom,msm-imem@146aa000 {
@@ -1196,7 +1231,7 @@
 				<DCC_READ 0x969871c 1 0>;
 	};
 
-	restart@c264000 {
+	msm_poweroff: restart@c264000 {
 		compatible = "qcom,pshold";
 		reg = <0xc264000 0x4>,
 		      <0x1fd3000 0x4>;
@@ -1396,9 +1431,10 @@
 		reg-names = "wdt-base";
 		interrupts = <GIC_SPI 0 IRQ_TYPE_NONE>,
 				<GIC_SPI 1 IRQ_TYPE_NONE>;
-		qcom,bark-time = <11000>;
+		qcom,bark-time = <15000>;
 		qcom,pet-time = <9360>;
 		qcom,ipi-ping;
+		qcom,wakeup-enable;
 		qcom,scandump-sizes = <0x10100 0x10100 0x10100 0x10100
 				       0x10100 0x10100 0x25900 0x25900>;
 	};
@@ -1599,6 +1635,7 @@
 		qcom,adsp-remoteheap-vmid = <22 37>;
 		qcom,fastrpc-adsp-audio-pdr;
 		qcom,fastrpc-adsp-sensors-pdr;
+		qcom,qos-cores = <0 1 2 3 4 5>;
 
 		qcom,msm_fastrpc_compute_cb1 {
 			compatible = "qcom,msm-fastrpc-compute-cb";
@@ -1710,8 +1747,8 @@
 		qcom,firmware-name = "adsp";
 		memory-region = <&pil_adsp_mem>;
 		qcom,signal-aop;
-		qcom,complete-ramdump;
-		qcom,minidump-as-elf32;
+/*		qcom,complete-ramdump;
+		qcom,minidump-as-elf32; */
 
 		/* Inputs from lpass */
 		interrupts-extended = <&pdc GIC_SPI 162 IRQ_TYPE_EDGE_RISING>,
@@ -2137,6 +2174,7 @@
 
 			label = "adsp";
 			qcom,glink-label = "lpass";
+			cpu-affinity = <1 2>;
 
 			qcom,adsp_qrtr {
 				qcom,glink-channels = "IPCRTR";
@@ -2846,8 +2884,8 @@
 		"MAX";
 
 		/* PM QoS */
-		qcom,pm-qos-cpu-groups = <0x3f 0xC0>;
-		qcom,pm-qos-cpu-group-latency-us = <67 67>;
+		qcom,pm-qos-cpu-groups = <0x1 0x2 0x4 0x8 0x10 0x20 0x40 0x80>;
+		qcom,pm-qos-cpu-group-latency-us = <67 67 67 67 67 67 67 67>;
 		qcom,pm-qos-default-cpu = <0>;
 
 		pinctrl-names = "dev-reset-assert", "dev-reset-deassert";
@@ -3813,13 +3851,13 @@
 			qcom,initial-pwrlevel = <5>;
 			qcom,ca-target-pwrlevel = <4>;
 
-			/* NOM_L1 */
+			/* TURBO */
 			qcom,gpu-pwrlevel@0 {
 				reg = <0>;
 				qcom,gpu-freq = <750000000>;
-				qcom,bus-freq = <11>;
+				qcom,bus-freq = <12>;
 				qcom,bus-min = <10>;
-				qcom,bus-max = <11>;
+				qcom,bus-max = <12>;
 			};
 
 			/* NOM_L1 */
@@ -3828,7 +3866,7 @@
 				qcom,gpu-freq = <650000000>;
 				qcom,bus-freq = <10>;
 				qcom,bus-min = <8>;
-				qcom,bus-max = <11>;
+				qcom,bus-max = <12>;
 			};
 
 			/* NOM */
@@ -3960,6 +3998,7 @@
 #include "pm6150l.dtsi"
 #include "atoll-pinctrl.dtsi"
 #include "atoll-pm.dtsi"
+#include "atoll-coresight.dtsi"
 #include "atoll-regulator.dtsi"
 #include "atoll-usb.dtsi"
 #include "atoll-vidc.dtsi"
@@ -3974,6 +4013,7 @@
 		label = "smb1390_therm";
 		qcom,hw-settle-time = <200>;
 		qcom,pre-scaling = <1 1>;
+		qcom,scale-fn-type = <15>;
 	};
 
 	chg_skin_therm {
@@ -4192,7 +4232,12 @@
 	vdd_l7-supply = <&BOB>;
 };
 
+&pm8008_8 {
+	status = "disabled";
+};
+
 &pm8008_9 {
+	status = "disabled";
 	/* GPIO1 pinctrl config */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pm8008_gpio1_active>;
@@ -4216,7 +4261,7 @@
 
 &L4P {
 	regulator-min-microvolt = <2800000>;
-	regulator-max-microvolt = <3400000>;
+	regulator-max-microvolt = <2800000>;
 	qcom,min-dropout-voltage = <200000>;
 };
 

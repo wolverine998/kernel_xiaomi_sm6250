@@ -533,7 +533,7 @@ config PCI_ENDPOINT_TEST
 
 config UID_SYS_STATS
 	bool "Per-UID statistics"
-	depends on PROFILING && TASK_XACCT && TASK_IO_ACCOUNTING
+	depends on TASK_XACCT && TASK_IO_ACCOUNTING
 	help
 	  Per UID based cpu time statistics exported to /proc/uid_cputime
 	  Per UID based io statistics exported to /proc/uid_io
@@ -595,12 +595,10 @@ config TEST_IRQ_REQUESTER
 
 	  If in doubt, say N.
 
-config FORCE_FAST_CHARGE
-	bool "Force faster charge rate for USB"
-	default n
-	help
-	  This allows users to override default charge rate for USB
-
+config LDO_WL2866D
+	bool  "multi ldo wl2866d"
+	---help---
+	This option enables multi ldo wl2866d.
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/aw8624_haptic/Kconfig"
 source "drivers/misc/drv2624_haptic/Kconfig"
@@ -616,6 +614,7 @@ source "drivers/misc/genwqe/Kconfig"
 source "drivers/misc/echo/Kconfig"
 source "drivers/misc/cxl/Kconfig"
 source "drivers/misc/fpr_FingerprintCard/Kconfig"
+source "drivers/misc/mi-memory/Kconfig"
 endmenu
 
 config OKL4_USER_VIPC
@@ -636,3 +635,19 @@ config OKL4_LINK_SHBUF
 	      transport. This driver presents the link to Linux as a character device
 	      which can be written to or read from to access the shared memory. An ioctl
 	      on the device is used to send a virtual interrupt to the partner cell.
+
+config ANT_CHECK
+	tristate "ant check gpio"
+	help
+	  Say 'y' here to include support for the QTI QPNP MISC
+	  peripheral. The MISC peripheral holds the USB ID interrupt
+	  and the driver provides an API to check if this interrupt
+	  is available on the current PMIC chip.
+
+config ANT_CHECK_DIV
+	tristate "ant check div gpio"
+	help
+	  Say 'y' here to include support for the QTI QPNP MISC
+	  peripheral. The MISC peripheral holds the USB ID interrupt
+	  and the driver provides an API to check if this interrupt
+	  is available on the current PMIC chip.		  

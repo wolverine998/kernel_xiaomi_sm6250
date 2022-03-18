@@ -189,6 +189,7 @@ struct spi_geni_master {
 	u32 miso_sampling_ctrl_val;
 };
 
+/*2019.11.30 longcheer wanghan add start*/
 /******************************************************************************
  * *This functionis for get spi_geni_master->dev
  * *spi_master: struct spi_device ->master
@@ -200,6 +201,7 @@ struct device *lct_get_spi_geni_master_dev(struct spi_master *spi)
 	return geni_mas->dev;
 }
 EXPORT_SYMBOL(lct_get_spi_geni_master_dev);
+/*2019.11.30 longcheer wanghan add end*/
 
 static void spi_slv_setup(struct spi_geni_master *mas);
 static void ssr_spi_force_suspend(struct device *dev);

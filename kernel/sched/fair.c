@@ -673,17 +673,6 @@ static struct sched_entity *__pick_next_entity(struct sched_entity *se)
 	return rb_entry(next, struct sched_entity, run_node);
 }
 
-#ifdef CONFIG_SCHED_DEBUG
-struct sched_entity *__pick_last_entity(struct cfs_rq *cfs_rq)
-{
-	struct rb_node *last = rb_last(&cfs_rq->tasks_timeline.rb_root);
-
-	if (!last)
-		return NULL;
-
-	return rb_entry(last, struct sched_entity, run_node);
-}
-
 /**************************************************************
  * Scheduling class statistics methods:
  */
@@ -710,6 +699,44 @@ int sched_proc_update_handler(struct ctl_table *table, int write,
 
 	return 0;
 }
+
+#ifdef CONFIG_SCHED_DEBUG
+struct sched_entity *__pick_last_entity(struct cfs_rq *cfs_rq)
+{
+	struct rb_node *last = rb_last(&cfs_rq->tasks_timeline.rb_root);
+
+	if (!last)
+		return NULL;
+
+	return rb_entry(last, struct sched_entity, run_node);
+}
+
+// /**************************************************************
+//  * Scheduling class statistics methods:
+//  */
+
+// int sched_proc_update_handler(struct ctl_table *table, int write,
+// 		void __user *buffer, size_t *lenp,
+// 		loff_t *ppos)
+// {
+// 	int ret = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
+// 	unsigned int factor = get_update_sysctl_factor();
+
+// 	if (ret || !write)
+// 		return ret;
+
+// 	sched_nr_latency = DIV_ROUND_UP(sysctl_sched_latency,
+// 					sysctl_sched_min_granularity);
+
+// #define WRT_SYSCTL(name) \
+// 	(normalized_sysctl_##name = sysctl_##name / (factor))
+// 	WRT_SYSCTL(sched_min_granularity);
+// 	WRT_SYSCTL(sched_latency);
+// 	WRT_SYSCTL(sched_wakeup_granularity);
+// #undef WRT_SYSCTL
+
+// 	return 0;
+// }
 #endif
 
 /*
@@ -5950,6 +5977,7 @@ struct energy_env {
  */
 static unsigned long cpu_util_without(int cpu, struct task_struct *p)
 {
+	struct cfs_rq *cfs_rq;
 	unsigned int util;
 
 #ifdef CONFIG_SCHED_WALT
@@ -5971,7 +5999,6 @@ static unsigned long cpu_util_without(int cpu, struct task_struct *p)
 #ifdef CONFIG_SCHED_WALT
 	util = max_t(long, cpu_util(cpu) - task_util(p), 0);
 #else
-	struct cfs_rq *cfs_rq;
 
 	cfs_rq = &cpu_rq(cpu)->cfs;
 	util = READ_ONCE(cfs_rq->avg.util_avg);

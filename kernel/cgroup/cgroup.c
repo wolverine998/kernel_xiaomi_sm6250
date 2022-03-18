@@ -3384,15 +3384,24 @@ static int cgroup_stat_show(struct seq_file *seq, void *v)
 #ifdef CONFIG_PSI
 static int cgroup_io_pressure_show(struct seq_file *seq, void *v)
 {
-	return psi_show(seq, &seq_css(seq)->cgroup->psi, PSI_IO);
+	struct cgroup *cgroup = seq_css(seq)->cgroup;
+	struct psi_group *psi = cgroup->id == 1 ? &psi_system : &cgroup->psi;
+
+	return psi_show(seq, psi, PSI_IO);
 }
 static int cgroup_memory_pressure_show(struct seq_file *seq, void *v)
 {
-	return psi_show(seq, &seq_css(seq)->cgroup->psi, PSI_MEM);
+	struct cgroup *cgroup = seq_css(seq)->cgroup;
+	struct psi_group *psi = cgroup->id == 1 ? &psi_system : &cgroup->psi;
+
+	return psi_show(seq, psi, PSI_MEM);
 }
 static int cgroup_cpu_pressure_show(struct seq_file *seq, void *v)
 {
-	return psi_show(seq, &seq_css(seq)->cgroup->psi, PSI_CPU);
+	struct cgroup *cgroup = seq_css(seq)->cgroup;
+	struct psi_group *psi = cgroup->id == 1 ? &psi_system : &cgroup->psi;
+
+	return psi_show(seq, psi, PSI_CPU);
 }
 
 static ssize_t cgroup_pressure_write(struct kernfs_open_file *of, char *buf,
@@ -3400,6 +3409,7 @@ static ssize_t cgroup_pressure_write(struct kernfs_open_file *of, char *buf,
 {
 	struct psi_trigger *new;
 	struct cgroup *cgrp;
+	struct psi_group *psi;
 
 	cgrp = cgroup_kn_lock_live(of->kn, false);
 	if (!cgrp)
@@ -3408,7 +3418,8 @@ static ssize_t cgroup_pressure_write(struct kernfs_open_file *of, char *buf,
 	cgroup_get(cgrp);
 	cgroup_kn_unlock(of->kn);
 
-	new = psi_trigger_create(&cgrp->psi, buf, nbytes, res);
+	psi = cgroup_ino(cgrp) == 1 ? &psi_system : &cgrp->psi;
+	new = psi_trigger_create(psi, buf, nbytes, res);
 	if (IS_ERR(new)) {
 		cgroup_put(cgrp);
 		return PTR_ERR(new);
@@ -4643,7 +4654,7 @@ static struct cftype cgroup_base_files[] = {
 #ifdef CONFIG_PSI
 	{
 		.name = "io.pressure",
-		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_PRESSURE,
+		.flags = CFTYPE_PRESSURE,
 		.seq_show = cgroup_io_pressure_show,
 		.write = cgroup_io_pressure_write,
 		.poll = cgroup_pressure_poll,
@@ -4651,7 +4662,7 @@ static struct cftype cgroup_base_files[] = {
 	},
 	{
 		.name = "memory.pressure",
-		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_PRESSURE,
+		.flags = CFTYPE_PRESSURE,
 		.seq_show = cgroup_memory_pressure_show,
 		.write = cgroup_memory_pressure_write,
 		.poll = cgroup_pressure_poll,
@@ -4659,7 +4670,7 @@ static struct cftype cgroup_base_files[] = {
 	},
 	{
 		.name = "cpu.pressure",
-		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_PRESSURE,
+		.flags = CFTYPE_PRESSURE,
 		.seq_show = cgroup_cpu_pressure_show,
 		.write = cgroup_cpu_pressure_write,
 		.poll = cgroup_pressure_poll,
@@ -6067,3 +6078,75 @@ int cgroup_bpf_detach(struct cgroup *cgrp, struct bpf_prog *prog,
 	return ret;
 }
 #endif /* CONFIG_CGROUP_BPF */
+
+#ifdef CONFIG_SYSFS
+static ssize_t show_delegatable_files(struct cftype *files, char *buf,
+				      ssize_t size, const char *prefix)
+{
+	struct cftype *cft;
+	ssize_t ret = 0;
+
+	for (cft = files; cft && cft->name[0] != '\0'; cft++) {
+		if (!(cft->flags & CFTYPE_NS_DELEGATABLE))
+			continue;
+
+		if ((cft->flags & CFTYPE_PRESSURE) && !cgroup_psi_enabled())
+			continue;
+
+		if (prefix)
+			ret += snprintf(buf + ret, size - ret, "%s.", prefix);
+
+		ret += snprintf(buf + ret, size - ret, "%s\n", cft->name);
+
+		if (unlikely(ret >= size)) {
+			WARN_ON(1);
+			break;
+		}
+	}
+
+	return ret;
+}
+
+static ssize_t delegate_show(struct kobject *kobj, struct kobj_attribute *attr,
+			      char *buf)
+{
+	struct cgroup_subsys *ss;
+	int ssid;
+	ssize_t ret = 0;
+
+	ret = show_delegatable_files(cgroup_base_files, buf, PAGE_SIZE - ret,
+				     NULL);
+
+	for_each_subsys(ss, ssid)
+		ret += show_delegatable_files(ss->dfl_cftypes, buf + ret,
+					      PAGE_SIZE - ret,
+					      cgroup_subsys_name[ssid]);
+
+	return ret;
+}
+static struct kobj_attribute cgroup_delegate_attr = __ATTR_RO(delegate);
+
+static ssize_t features_show(struct kobject *kobj, struct kobj_attribute *attr,
+			     char *buf)
+{
+	return snprintf(buf, PAGE_SIZE, "nsdelegate\n");
+}
+static struct kobj_attribute cgroup_features_attr = __ATTR_RO(features);
+
+static struct attribute *cgroup_sysfs_attrs[] = {
+	&cgroup_delegate_attr.attr,
+	&cgroup_features_attr.attr,
+	NULL,
+};
+
+static const struct attribute_group cgroup_sysfs_attr_group = {
+	.attrs = cgroup_sysfs_attrs,
+	.name = "cgroup",
+};
+
+static int __init cgroup_sysfs_init(void)
+{
+	return sysfs_create_group(kernel_kobj, &cgroup_sysfs_attr_group);
+}
+subsys_initcall(cgroup_sysfs_init);
+#endif /* CONFIG_SYSFS */

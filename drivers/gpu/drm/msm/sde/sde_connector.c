@@ -24,6 +24,14 @@
 #include "sde_crtc.h"
 #include "sde_rm.h"
 
+//2019.12.11 longcheer zhaoxiangxiang add for esd check start
+static int esd_irq_count;
+static int tp_update_firmware = 0;
+extern void lcd_esd_handler(bool on);
+extern char *saved_command_line;
+
+//2019.12.11 longcheer zhaoxiangxiang add for esd check start
+
 #define BL_NODE_NAME_SIZE 32
 
 /* Autorefresh will occur after FRAME_CNT frames. Large values are unlikely */
@@ -1147,6 +1155,12 @@ static int sde_connector_atomic_set_property(struct drm_connector *connector,
 	/* connector-specific property handling */
 	idx = msm_property_index(&c_conn->property_info, property);
 	switch (idx) {
+	if (strnstr(saved_command_line,"tianma",strlen(saved_command_line)) != NULL){
+	case CONNECTOR_PROP_LP:
+		if (connector->dev)
+			connector->dev->doze_state = val;
+		break;
+	}
 	case CONNECTOR_PROP_OUT_FB:
 		/* clear old fb, if present */
 		if (c_state->out_fb)
@@ -1846,72 +1860,76 @@ static int sde_connector_atomic_check(struct drm_connector *connector,
 	return 0;
 }
 
-static int esd_irq_count = 0;
-static bool tp_update_firmware = false;
-extern void lcd_esd_handler(bool en);
-
-void lcd_esd_enable(bool en)
+//2019.12.11 longcheer zhaoxiangxiang add for esd check start
+void lcd_esd_enable(bool on)
 {
-	tp_update_firmware = en;
+  if(on)
+    tp_update_firmware = 0;
+  else
+    tp_update_firmware = 1;
 }
 EXPORT_SYMBOL(lcd_esd_enable);
 
-static void esd_recovery(int irq, void *data)
+static void esd_recovery(int irq,void *data)
 {
-	struct sde_connector *conn = data;
-	struct dsi_display *display;
-	struct dsi_panel *panel;
-	struct drm_event event;
-
-	if (!conn && !conn->display) {
-		SDE_ERROR("not able to get connector object\n");
+       struct sde_connector *c_conn = data;
+       struct drm_event event;
+       bool panel_on = true;
+       struct dsi_display *dsi_display;
+       if (!c_conn && !c_conn->display) {
+               SDE_ERROR("not able to get connector object\n");
 		return ;
+       }
+
+       dsi_display = (struct dsi_display *)(c_conn->display);
+
+       if (dsi_display && dsi_display->panel) {
+	       panel_on = dsi_display->panel->panel_initialized;
+       }
+
+       if((strnstr(dsi_display->panel->name,"huaxing",30) != NULL)){
+	if (panel_on) {
+		esd_irq_count ++;
+		if(esd_irq_count == 3){
+	       disable_irq_nosync(irq);
+	       lcd_esd_handler(1);
+               c_conn->panel_dead = true;
+               event.type = DRM_EVENT_PANEL_DEAD;
+               event.length = sizeof(bool);
+               msm_mode_object_event_notify(&c_conn->base.base,
+                       c_conn->base.dev, &event, (u8 *)&c_conn->panel_dead);
+               sde_encoder_display_failure_notification(c_conn->encoder,false);
+		esd_irq_count = 0;
+		}
 	}
-
-	display = (struct dsi_display *)(conn->display);
-	if (!display || !display->panel)
-		return;
-
-	panel = display->panel;
-
-	if (!panel->panel_initialized)
-		return;
-
-	esd_irq_count++;
-
-	if (panel->special_panel == DSI_SPECIAL_PANEL_HUAXING && esd_irq_count != 3)
-		return;
-
-	esd_irq_count = 0;
-
-	if (panel->special_panel == DSI_SPECIAL_PANEL_HUAXING) {
-		disable_irq_nosync(irq);
-		lcd_esd_handler(1);
-	} else if (panel->special_panel == DSI_SPECIAL_PANEL_TIANMA) {
-		lcd_esd_enable(false);
+	}else if((strnstr(dsi_display->panel->name,"tianma",30) != NULL)){
+		if (panel_on){
+			lcd_esd_enable(0);
+			c_conn->panel_dead = true;
+			event.type = DRM_EVENT_PANEL_DEAD;
+			event.length = sizeof(bool);
+			msm_mode_object_event_notify(&c_conn->base.base,
+				c_conn->base.dev, &event, (u8 *)&c_conn->panel_dead);
+			sde_encoder_display_failure_notification(c_conn->encoder,false);
+		}
 	}
-
-	conn->panel_dead = true;
-	event.type = DRM_EVENT_PANEL_DEAD;
-	event.length = sizeof(bool);
-	msm_mode_object_event_notify(&conn->base.base,
-		conn->base.dev, &event, (u8 *)&conn->panel_dead);
-	sde_encoder_display_failure_notification(conn->encoder,
-		false);
-	SDE_EVT32(SDE_EVTLOG_ERROR);
-	SDE_ERROR("esd check failed report PANEL_DEAD conn_id: %d enc_id: %d\n",
-			conn->base.base.id, conn->encoder->base.id);
+       pr_info("esd check irq report panel_status = %d esd_irq = %d panel_name = %s\n",
+	       panel_on,esd_irq_count,dsi_display->panel->name);
+       return ;
 }
 
 static irqreturn_t esd_err_irq_handle(int irq, void *data)
 {
-	if (tp_update_firmware)
-		return IRQ_HANDLED;
+       pr_info("esd check irq report tp_update_firmware = %d\n",
+	tp_update_firmware);
 
-	esd_recovery(irq, data);
-
+	if(tp_update_firmware){
 	return IRQ_HANDLED;
+	}
+       esd_recovery(irq,data);
+       return IRQ_HANDLED;
 }
+//2019.12.11 longcheer zhaoxiangxiang add for esd check end
 
 static void _sde_connector_report_panel_dead(struct sde_connector *conn,
 	bool skip_pre_kickoff)
@@ -1937,8 +1955,6 @@ static void _sde_connector_report_panel_dead(struct sde_connector *conn,
 	sde_encoder_display_failure_notification(conn->encoder,
 		skip_pre_kickoff);
 	SDE_EVT32(SDE_EVTLOG_ERROR);
-	SDE_ERROR("esd check failed report PANEL_DEAD conn_id: %d enc_id: %d\n",
-			conn->base.base.id, conn->encoder->base.id);
 }
 
 int sde_connector_esd_status(struct drm_connector *conn)
@@ -2210,7 +2226,7 @@ struct drm_connector *sde_connector_init(struct drm_device *dev,
 	struct dsi_display *dsi_display;
 	struct msm_display_info display_info;
 	int rc;
-
+	esd_irq_count = 0;
 	if (!dev || !dev->dev_private || !encoder) {
 		SDE_ERROR("invalid argument(s), dev %pK, enc %pK\n",
 				dev, encoder);

@@ -566,7 +566,6 @@ static void gsi_process_chan(struct gsi_xfer_compl_evt *evt,
 	if (callback) {
 		if (atomic_read(&ch_ctx->poll_mode)) {
 			GSIERR("Calling client callback in polling mode\n");
-			WARN_ON(1);
 		}
 		ch_ctx->props.xfer_cb(notify);
 	}
@@ -2521,7 +2520,7 @@ static void __gsi_write_channel_scratch(unsigned long chan_hdl,
 }
 
 static void __gsi_write_wdi3_channel_scratch2_reg(unsigned long chan_hdl,
-		union __packed gsi_wdi3_channel_scratch2_reg val)
+		union gsi_wdi3_channel_scratch2_reg val)
 {
 	gsi_writel(val.data.word1, gsi_ctx->base +
 		GSI_EE_n_GSI_CH_k_SCRATCH_2_OFFS(chan_hdl,
@@ -2561,7 +2560,7 @@ int gsi_write_channel_scratch3_reg(unsigned long chan_hdl,
 EXPORT_SYMBOL(gsi_write_channel_scratch3_reg);
 
 int gsi_write_channel_scratch2_reg(unsigned long chan_hdl,
-		union __packed gsi_wdi2_channel_scratch2_reg val)
+		union gsi_wdi2_channel_scratch2_reg val)
 {
 	struct gsi_chan_ctx *ctx;
 
@@ -2613,7 +2612,7 @@ static void __gsi_read_channel_scratch(unsigned long chan_hdl,
 }
 
 static void __gsi_read_wdi3_channel_scratch2_reg(unsigned long chan_hdl,
-		union __packed gsi_wdi3_channel_scratch2_reg * val)
+		union gsi_wdi3_channel_scratch2_reg * val)
 {
 
 	val->data.word1 = gsi_readl(gsi_ctx->base +
@@ -2711,7 +2710,7 @@ int gsi_write_channel_scratch(unsigned long chan_hdl,
 EXPORT_SYMBOL(gsi_write_channel_scratch);
 
 int gsi_write_wdi3_channel_scratch2_reg(unsigned long chan_hdl,
-		union __packed gsi_wdi3_channel_scratch2_reg val)
+		union gsi_wdi3_channel_scratch2_reg val)
 {
 	struct gsi_chan_ctx *ctx;
 
@@ -2779,7 +2778,7 @@ int gsi_read_channel_scratch(unsigned long chan_hdl,
 EXPORT_SYMBOL(gsi_read_channel_scratch);
 
 int gsi_read_wdi3_channel_scratch2_reg(unsigned long chan_hdl,
-		union __packed gsi_wdi3_channel_scratch2_reg * val)
+		union gsi_wdi3_channel_scratch2_reg * val)
 {
 	struct gsi_chan_ctx *ctx;
 
@@ -3826,7 +3825,7 @@ int gsi_config_channel_mode(unsigned long chan_hdl, enum gsi_chan_mode mode)
 	}
 
 	if (chan_hdl >= gsi_ctx->max_ch) {
-		GSIERR("bad params chan_hdl=%lu mode=%u\n", chan_hdl, mode);
+		GSIDBG("bad params chan_hdl=%lu mode=%u\n", chan_hdl, mode);
 		return -GSI_STATUS_INVALID_PARAMS;
 	}
 
@@ -3852,7 +3851,7 @@ int gsi_config_channel_mode(unsigned long chan_hdl, enum gsi_chan_mode mode)
 		curr = GSI_CHAN_MODE_CALLBACK;
 
 	if (mode == curr) {
-		GSIERR("already in requested mode %u chan_hdl=%lu\n",
+		GSIDBG("already in requested mode %u chan_hdl=%lu\n",
 				curr, chan_hdl);
 		spin_unlock_irqrestore(&gsi_ctx->slock, flags);
 		return -GSI_STATUS_UNSUPPORTED_OP;

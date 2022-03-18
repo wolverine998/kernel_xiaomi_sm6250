@@ -22,10 +22,7 @@
 #include <linux/power_supply.h>
 #include <linux/thermal.h>
 #include "power_supply.h"
-#ifdef CONFIG_DEBUG_USB
-#undef dev_dbg
-#define dev_dbg dev_err
-#endif
+
 /* exported for the APM Power driver, APM emulation */
 struct class *power_supply_class;
 EXPORT_SYMBOL_GPL(power_supply_class);
@@ -357,7 +354,8 @@ static int __power_supply_is_system_supplied(struct device *dev, void *data)
 	unsigned int *count = data;
 
 	(*count)++;
-	if (psy->desc->type != POWER_SUPPLY_TYPE_BATTERY)
+	if (psy->desc->type != POWER_SUPPLY_TYPE_BATTERY &&
+	    psy->desc->type != POWER_SUPPLY_TYPE_BMS)
 		if (!psy->desc->get_property(psy, POWER_SUPPLY_PROP_ONLINE,
 					&ret))
 			return ret.intval;

@@ -608,9 +608,13 @@ int msm_vidc_dqbuf(void *instance, struct v4l2_buffer *b)
 	tag_data.index = b->index;
 	tag_data.type = b->type;
 
-	msm_comm_fetch_tags(inst, &tag_data);
-	b->m.planes[0].reserved[5] = tag_data.input_tag;
-	b->m.planes[0].reserved[6] = tag_data.output_tag;
+	if (msm_comm_fetch_tags(inst, &tag_data)) {
+		b->m.planes[0].reserved[5] = tag_data.input_tag;
+		b->m.planes[0].reserved[6] = tag_data.output_tag;
+	} else {
+		b->m.planes[0].reserved[5] = 0;
+		b->m.planes[0].reserved[6] = 0;
+	}
 
 	return rc;
 }
@@ -2000,8 +2004,10 @@ void *msm_vidc_open(int core_id, int session_type)
 
 	msm_comm_scale_clocks_and_bus(inst);
 
+#ifdef CONFIG_DEBUG_FS
 	inst->debugfs_root =
 		msm_vidc_debugfs_init_inst(inst, core->debugfs_root);
+#endif
 
 	if (inst->session_type == MSM_VIDC_CVP) {
 		rc = msm_comm_try_state(inst, MSM_VIDC_OPEN_DONE);

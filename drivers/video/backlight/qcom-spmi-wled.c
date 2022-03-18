@@ -284,7 +284,10 @@ static const u8 wled5_brt_wid_sel_reg[MOD_MAX] = {
 
 static int wled_flash_setup(struct wled *wled);
 
+#ifdef CONFIG_TARGET_PROJECT_J6
+//2020.01.07 longcheer zhaoxiangxiang add wled5_cabc_config statement
 static int wled5_cabc_config(struct wled *wled, bool enable);
+#endif
 
 static inline bool is_wled4(struct wled *wled)
 {
@@ -514,11 +517,15 @@ static int wled_update_status(struct backlight_device *bl)
 
 	mutex_lock(&wled->lock);
 	if (brightness) {
-		if (brightness < 50) {
+		#ifdef CONFIG_TARGET_PROJECT_J6
+		//2020.01.07 longcheer zhaoxiangxiang add for close cabc start
+		if(brightness < 50){
 			rc = wled5_cabc_config(wled, false);
-		} else if(brightness > 150) {
+		}else if(brightness > 150){
 			rc = wled5_cabc_config(wled, true);
 		}
+		//2020.01.07 longcheer zhaoxiangxiang add for close cabc end
+		#endif
 
 		rc = wled_set_brightness(wled, brightness);
 		if (rc < 0) {

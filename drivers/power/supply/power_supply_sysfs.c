@@ -45,9 +45,9 @@ static const char * const power_supply_type_text[] = {
 	"Unknown", "Battery", "UPS", "Mains", "USB",
 	"USB_DCP", "USB_CDP", "USB_ACA", "USB_C",
 	"USB_PD", "USB_PD_DRP", "BrickID",
-	"USB_HVDCP", "USB_HVDCP_3", "USB_HVDCP", "Wireless", "USB_FLOAT",
+	"USB_HVDCP", "USB_HVDCP_3", "USB_HVDCP_3P5", "Wireless", "USB_FLOAT",
 	"BMS", "Parallel", "Main", "Wipower", "USB_C_UFP", "USB_C_DFP",
-	"Charge_Pump",
+	"Charge_Pump", "batt_verify",
 };
 
 static const char * const power_supply_status_text[] = {
@@ -291,6 +291,8 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(capacity_alert_min),
 	POWER_SUPPLY_ATTR(capacity_alert_max),
 	POWER_SUPPLY_ATTR(capacity_level),
+	POWER_SUPPLY_ATTR(soc_decimal),
+	POWER_SUPPLY_ATTR(soc_decimal_rate),
 	POWER_SUPPLY_ATTR(temp),
 	POWER_SUPPLY_ATTR(temp_max),
 	POWER_SUPPLY_ATTR(temp_min),
@@ -434,6 +436,8 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(comp_clamp_level),
 	POWER_SUPPLY_ATTR(adapter_cc_mode),
 	POWER_SUPPLY_ATTR(skin_health),
+	POWER_SUPPLY_ATTR(apsd_rerun),
+	POWER_SUPPLY_ATTR(apsd_timeout),
 	POWER_SUPPLY_ATTR(qc3p5_power_limit),
 	POWER_SUPPLY_ATTR(qc3p5_current_max),
 	/* Charge pump properties */
@@ -525,12 +529,29 @@ void power_supply_init_attrs(struct device_type *dev_type)
 		__power_supply_attrs[i] = &power_supply_attrs[i].attr;
 }
 
+static char *kstruprdup(const char *str, gfp_t gfp)
+{
+	char *ret, *ustr;
+
+	ustr = ret = kmalloc(strlen(str) + 1, gfp);
+
+	if (!ret)
+		return NULL;
+
+	while (*str)
+		*ustr++ = toupper(*str++);
+
+	*ustr = 0;
+
+	return ret;
+}
+
 int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
 	struct power_supply *psy = dev_get_drvdata(dev);
 	int ret = 0, j;
 	char *prop_buf;
-	char attrname[64];
+	char *attrname;
 
 	if (!psy || !psy->desc) {
 		dev_dbg(dev, "No power supply yet\n");
@@ -547,8 +568,7 @@ int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
 
 	for (j = 0; j < psy->desc->num_properties; j++) {
 		struct device_attribute *attr;
-		const char *str;
-		char *line, *ustr;
+		char *line;
 
 		attr = &power_supply_attrs[psy->desc->properties[j]];
 
@@ -567,14 +587,14 @@ int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
 		if (line)
 			*line = 0;
 
-		str = attr->attr.name;
-		ustr = attrname;
-		while (*str)
-			*ustr++ = toupper(*str++);
-
-		*ustr = 0;
+		attrname = kstruprdup(attr->attr.name, GFP_KERNEL);
+		if (!attrname) {
+			ret = -ENOMEM;
+			goto out;
+		}
 
 		ret = add_uevent_var(env, "POWER_SUPPLY_%s=%s", attrname, prop_buf);
+		kfree(attrname);
 		if (ret)
 			goto out;
 	}
