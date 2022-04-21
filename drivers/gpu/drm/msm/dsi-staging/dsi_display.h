@@ -202,6 +202,7 @@ struct dsi_display {
 	struct drm_connector *ext_conn;
 
 	const char *name;
+	bool is_prim_display;
 	const char *display_type;
 	const char *dsi_type;
 	struct list_head list;
@@ -711,5 +712,9 @@ int dsi_display_cont_splash_config(void *display);
  */
 int dsi_display_get_panel_vfp(void *display,
 	int h_active, int v_active);
+
+int dsi_display_cmd_engine_enable(struct dsi_display *display);
+int dsi_display_cmd_engine_disable(struct dsi_display *display);
+int dsi_host_alloc_cmd_tx_buffer(struct dsi_display *display);
 
 #endif /* _DSI_DISPLAY_H_ */
